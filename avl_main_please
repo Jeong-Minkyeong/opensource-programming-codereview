@@ -1,0 +1,270 @@
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+using namespace std;
+
+struct Node {
+    int key;
+    Node* left;
+    Node* right;
+    int height;
+    int size;
+
+    Node(int k) : key(k), left(nullptr), right(nullptr), height(1), size(1) {}
+};
+
+class AVLTree {
+private:
+    Node* root;
+
+    int getHeight(const Node* node) const {
+        return node ? node->height : 0;
+    }
+
+    int getSize(const Node* node) const {
+        return node ? node->size : 0;
+    }
+
+    void updateNode(Node* node) {
+        if (node) {
+            node->height = max(getHeight(node->left), getHeight(node->right)) + 1;
+            node->size = getSize(node->left) + getSize(node->right) + 1;
+        }
+    }
+
+    Node* rotateRight(Node* y) {
+        Node* x = y->left;
+        Node* T2 = x->right;
+
+        x->right = y;
+        y->left = T2;
+
+        updateNode(y);
+        updateNode(x);
+
+        return x;
+    }
+
+    Node* rotateLeft(Node* x) {
+        Node* y = x->right;
+        Node* T2 = y->left;
+
+        y->left = x;
+        x->right = T2;
+
+        updateNode(x);
+        updateNode(y);
+
+        return y;
+    }
+
+    int getBalance(const Node* node) const {
+        return node ? getHeight(node->left) - getHeight(node->right) : 0;
+    }
+
+    int sum(const Node* node) const {
+        if (!node) return 0;
+        return node->key + sum(node->left) + sum(node->right);
+    }
+
+    int rank(const Node* node, int key) const {
+        if (!node) return 0;
+        if (key < node->key)
+            return rank(node->left, key);
+        else if (key > node->key)
+            return getSize(node->left) + 1 + rank(node->right, key);
+        else
+            return getSize(node->left);
+    }
+
+    bool ancestor(const Node* node, int key, vector<int>& ancestors) const {
+        if (!node) return false;
+        ancestors.push_back(node->key);
+        if (node->key == key) return true;
+        if (key < node->key) return ancestor(node->left, key, ancestors);
+        return ancestor(node->right, key, ancestors);
+    }
+
+public:
+    AVLTree() : root(nullptr) {}
+
+    void insert(int key) {
+        root = insert(root, key);
+    }
+
+    Node* insert(Node* node, int key) {
+        if (!node) return new Node(key);
+
+        if (key < node->key)
+            node->left = insert(node->left, key);
+        else if (key > node->key)
+            node->right = insert(node->right, key);
+        else
+            return node;
+
+        updateNode(node);
+
+        int balance = getBalance(node);
+
+        if (balance > 1 && key < node->left->key)
+            return rotateRight(node);
+
+        if (balance < -1 && key > node->right->key)
+            return rotateLeft(node);
+
+        if (balance > 1 && key > node->left->key) {
+            node->left = rotateLeft(node->left);
+            return rotateRight(node);
+        }
+
+        if (balance < -1 && key < node->right->key) {
+            node->right = rotateRight(node->right);
+            return rotateLeft(node);
+        }
+
+        return node;
+    }
+
+    void erase(int key) {
+        root = erase(root, key);
+    }
+
+    Node* erase(Node* node, int key) {
+        if (!node) return node;
+
+        if (key < node->key)
+            node->left = erase(node->left, key);
+        else if (key > node->key)
+            node->right = erase(node->right, key);
+        else {
+            if (!node->left || !node->right) {
+                Node* temp = node->left ? node->left : node->right;
+                if (!temp) {
+                    temp = node;
+                    node = nullptr;
+                }
+                else {
+                    *node = *temp;
+                }
+                delete temp;
+            }
+            else {
+                Node* temp = minValueNode(node->right);
+                node->key = temp->key;
+                node->right = erase(node->right, temp->key);
+            }
+        }
+
+        if (!node) return node;
+
+        updateNode(node);
+
+        int balance = getBalance(node);
+
+        if (balance > 1 && getBalance(node->left) >= 0)
+            return rotateRight(node);
+
+        if (balance > 1 && getBalance(node->left) < 0) {
+            node->left = rotateLeft(node->left);
+            return rotateRight(node);
+        }
+
+        if (balance < -1 && getBalance(node->right) <= 0)
+            return rotateLeft(node);
+
+        if (balance < -1 && getBalance(node->right) > 0) {
+            node->right = rotateRight(node->right);
+            return rotateLeft(node);
+        }
+
+        return node;
+    }
+
+    Node* minValueNode(Node* node) {
+        Node* current = node;
+        while (current && current->left)
+            current = current->left;
+        return current;
+    }
+
+    bool empty() const {
+        return root == nullptr;
+    }
+
+    int size() const {
+        return getSize(root);
+    }
+
+    int height() const {
+        return getHeight(root);
+    }
+
+    double average() const {
+        return empty() ? 0 : static_cast<double>(sum(root)) / size();
+    }
+
+    int rank(int key) const {
+        return rank(root, key);
+    }
+
+    vector<int> ancestor(int key) const {
+        vector<int> ancestors;
+        ancestor(root, key, ancestors);
+        return ancestors;
+    }
+};
+
+int main() {
+    AVLTree tree;
+    /*tree.insert(10);
+    tree.insert(20);
+    tree.insert(30);
+    tree.insert(40);
+    tree.insert(50);
+    tree.insert(25);
+
+    cout << "Size: " << tree.size() << endl;
+    cout << "Height: " << tree.height() << endl;
+    cout << "Average: " << tree.average() << endl;
+    cout << "Rank of 30: " << tree.rank(30) << endl;
+
+    vector<int> ancestors = tree.ancestor(25);
+    cout << "Ancestors of 25: ";
+    for (int a : ancestors) cout << a << " ";
+    cout << endl;
+
+    tree.erase(30);
+    cout << "Size after erasing 30: " << tree.size() << endl;
+
+    return 0;
+    */
+    int insertnum = 0;
+    int behavenum = 0;
+    int nodereal = 0;
+    cout << "입력 할 노드의 개수는 :";
+    cin >> insertnum;
+    cout << "노드를 입력하시오" << endl;
+    for (int i = 0; i < insertnum; i++)
+    {
+        cin >> nodereal;
+        tree.insert(nodereal);
+    }
+    
+    string a;
+    cout << "기능을 실행합니다" << endl;
+    while (!behavenum)
+    {
+        cin >> a;
+        if (a == "size")
+        {
+            cout << tree.size() << endl;
+        }
+        else if (a == "height")
+        {
+            cout << tree.height() << endl;
+        }
+        else if(a=="")
+    }
+
+}
