@@ -1,0 +1,90 @@
+#include <iostream>
+#include <queue>
+using namespace std;
+
+int N;
+int arr[1005][1005];
+char brr[1005][1005];
+char crr[1005][1005];
+bool visited[1000001];
+bool checked[1005][1005];
+int x_dir[4] = { 0,0,1,-1 };
+int y_dir[4] = { 1,-1,0,0 };
+
+
+bool brrCheck(int a, int b) {
+	if (brr[a][b] == '<') {
+		if (arr[a][b] < arr[a][b + 1]) return true;
+	}
+	else {
+		if (arr[a][b] > arr[a][b + 1]) return true;
+	}
+	return false;
+}
+
+bool crrCheck(int a, int b) {
+	if (crr[a][b] == '<') {
+		if (arr[a][b] < arr[a+1][b]) return true;
+	}
+	else {
+		if (arr[a][b] > arr[a+1][b]) return true;
+	}
+	return false;
+}
+
+
+void solve(int a, int b) {
+		queue<pair<int,int>> q;
+		q.push({a,b});
+		checked[a][b] = true;
+		while (!q.empty()) {
+			int x = q.front().first;
+			int y = q.front().second;
+			for (int i = 0; i < 4; i++) {
+				int newX = x + x_dir[i];
+				int newY = y + y_dir[i];
+				if()
+			}
+		}
+	
+}
+
+//void backTracking(int knt ,int cnt) {
+//	if (!line()) {
+//		return;
+//	}
+//	if (cnt == N && cnt == N) {
+//
+//	}
+//	for (int i = 1; i <= (N*N); i++) {
+//		if (!visited[i]) {
+//			visited[i] = true;
+//			arr[knt][cnt] = i;
+//			if (cnt == N) {
+//				backTracking(knt+1, 0);
+//			}
+//			else {
+//				backTracking(knt, cnt + 1);
+//			}
+//			visited[i] = false;
+//		}
+//	}
+//}
+
+
+
+
+int main() {
+	cin >> N;
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N - 1; j++) {
+			cin >> brr[i][j];
+		}
+	}
+	for (int i = 0; i < N-1; i++) {
+		for (int j = 0; j < N; j++) {
+			cin >> crr[i][j];
+		}
+	}
+
+}
