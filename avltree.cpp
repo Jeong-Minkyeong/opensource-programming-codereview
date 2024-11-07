@@ -242,7 +242,7 @@ int main() {
     while (cin >> command) {
 
 
-        if (command == "Ancestor") { // Ancestor
+        if (command == "Ancestor123") { // Ancestor
             int x;
             cin >> x;
             tree.ancestor(x);
