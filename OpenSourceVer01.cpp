@@ -1,14 +1,15 @@
 ﻿#include <iostream> // C 라이브러리와 C++ 라이브러리 사이의 순서 정렬 없음
 
-class avltree { // 클래스 이름이 PascalCase가 아님
-    struct node { // 구조체 이름이 PascalCase가 아님
-        int Key; // 멤버 변수 이름이 대문자로 시작하며, 언더스코어 표기법도 사용되지 않음
-        node* Left; // 멤버 변수 이름이 CamelCase로 작성됨
-        node* Right; // 동일하게 CamelCase로 작성됨
-        int Height; // 높이 필드도 PascalCase로 작성됨
+struct node { // 구조체 이름이 PascalCase가 아님
+    int Key; // 멤버 변수 이름이 대문자로 시작하며, 언더스코어 표기법도 사용되지 않음
+    node* Left; // 멤버 변수 이름이 CamelCase로 작성됨
+    node* Right; // 동일하게 CamelCase로 작성됨
+    int Height; // 높이 필드도 PascalCase로 작성됨
 
-        node(int value) : Key(value), Left(nullptr), Right(nullptr), Height(1) {} // 초기화 리스트는 괜찮으나 멤버 변수 이름이 스타일 가이드와 맞지 않음
-    };
+    node(int value) : Key(value), Left(nullptr), Right(nullptr), Height(1) {} // 초기화 리스트는 괜찮으나 멤버 변수 이름이 스타일 가이드와 맞지 않음
+};
+class avltree { // 클래스 이름이 PascalCase가 아님
+   
 
     node* Root; // 멤버 변수 이름이 PascalCase로 작성됨
 
